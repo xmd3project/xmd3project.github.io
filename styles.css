@@ -1,0 +1,132 @@
+body {
+    font-size: 11px;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #aaa;
+}
+
+.title {
+    font-size: 14px;
+    fill: #2c4d91;
+}
+
+.axis-label {
+    font-size: 12px;
+    font-style: bold;
+    fill: #2c4d91;
+}
+
+.tick text {
+    font-size: 12px;
+}
+
+.line {
+    fill: none;
+    stroke: #7382a1;
+    stroke-width: 2;
+}
+
+.line.hidden {
+    fill: none;
+    stroke: none;
+    stroke-width: 2;
+}
+
+.overlay {
+    fill: none;
+    pointer-events: all;
+}
+
+.dot {
+    fill: #324468;
+    stroke: #fff;
+}
+
+.dot.detailed {
+    fill: #23bec9;
+}
+
+.dot:hover {
+    fill: #2ae1ee;
+    stroke: #324468;
+    stroke-width: 2;
+}
+
+.dot.detailed:hover {
+    stroke: #324468;
+    cursor: pointer;
+    animation-name: flash;
+    animation-duration: 0.3s;
+    animation-timing-function: linear;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    animation-play-state: running;
+}
+
+@keyframes flash {
+    from { stroke: #00eeff; }
+    to { stroke: #324468; }
+}
+
+.tooltip {
+    border: 2px solid #aaa;
+    position: absolute;
+    padding: 5px;
+    border-radius: 3px;
+    background-color: #fbfbfb;
+    text-align: justify;
+    color: #324468;
+    line-height: 1.5;
+    z-index: 1;
+    max-width: 280px;
+    margin: 20px;
+}
+.tooltip b {
+    color: #23bec9;
+}
+.tooltip .left {
+    float: left;
+    text-align: left;
+}
+.tooltip .detail {
+    float: left;
+    text-align: justify;
+    min-width: 200px;
+}
+.tooltip .link-out {
+    position: absolute;
+    right: 3px;
+    top: 3px;
+    height: 18px;
+    opacity: 0.5;
+}
+
+ul {
+    margin: auto 0;
+    list-style: none;
+    top: 20px;
+    left: 50%;
+    position: absolute;
+    transform: translateX(-50%);
+    display: inline-block;
+}
+li {
+    border-style: solid;
+    border-color: #7382a1;
+    border-width: 1px 1px 1px 0px;
+    padding: 10px;
+    float: left;
+}
+li:hover, li.current {
+    background-color: #7382a1;
+    color: #fff;
+    cursor: pointer;
+}
+li:first-child {
+    border-width: 1px 0px 1px 1px;
+}
+li:nth-child(2) {
+    border-left-width: 1px;
+}
+li.hidden {
+    opacity: 0;
+}

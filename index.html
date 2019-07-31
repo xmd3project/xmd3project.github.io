@@ -1,36 +1,19 @@
-<html>
-<script src='https://d3js.org/d3.v5.min.js'></script>
-<style> circle {fill: lightblue; stroke: black;} </style>
-<body onload='init()'>
-<svg width=300 height=300>
-</svg>
-<script>
-async function init() {
-var data = await d3.csv("https://flunky.github.io/cars2017.csv");
-//console.log(data);
-var scaleX = d3.scaleLog()
-    .domain([10, 150])
-    .range([0, 200]);
-var scaleY = d3.scaleLog()
-    .domain([10, 150])
-    .range([200, 0]);
-d3.select("svg").append("g")
-.attr("transform", "translate(50,50)")
-.selectAll("circle")
-.data(data)
-.enter()
-.append("circle")
-.attr("cx", function (d) { return scaleX(d.AverageCityMPG); })
-.attr("cy", function (d) { return scaleY(d.AverageHighwayMPG); })
-.attr("r", function (d) { return Number(d.EngineCylinders) + 2; });
+<!DOCTYPE html>
+<meta charset="utf-8">
+<head></head>
+<link rel="stylesheet" href="styles.css">
+</head>
 
-d3.select("svg").append("g")
-.attr("transform", "translate(50,50)")
-.call(d3.axisLeft(scaleY).tickValues([10, 20, 50, 100]).tickFormat(d3.format("~s")));
-d3.select("svg").append("g")
-.attr("transform", "translate(50,250)")
-.call(d3.axisBottom(scaleX).tickValues([10, 20, 50, 100]).tickFormat(d3.format("~s")));
-}
-</script>
+<body onload="init()">
+<ul>
+<li class="prev" onclick="goPrev()"><</li>
+<li class="slide-0" onclick="goTo(0)">1</li>
+<li class="slide-1" onclick="goTo(1)">2</li>
+<li class="slide-2" onclick="goTo(2)">3</li>
+<li class="slide-3" onclick="goTo(3)">4</li>
+<li class="next" onclick="goNext()">></li>
+</ul>
 </body>
-</html>
+
+<script src="https://d3js.org/d3.v5.min.js"></script>
+<script src="script.js"></script>
