@@ -1,5 +1,5 @@
-let currentSlide = 1;
-let slideData;
+let currentSlide = 0;
+let slideData, mortalityData;
 let startYear, endYear;
 let svg, g;
 let graphWidth, graphHeight, canvasWidth, canvasHeight, margin;
@@ -44,7 +44,8 @@ const significantEvents = {
 
 async function init() {
     const data = await d3.csv("https://xmd3project.github.io/NCHS_Age-adjusted_Death_Rates_for_Selected_Major_Causes_of_Death.csv");
-    slideData = mapMortalityData(data);
+    mortalityData = getMortalityData(data);
+    slideData = getSlideData(mortalityData);
 
     marginX = 280;
     marginY = 150;
@@ -145,6 +146,7 @@ function drawDynamicElems(slideDataSingle) {
     g.selectAll(".dot")
         .data(slideDataSingle)
         .enter().append("circle")
+        .style('opacity', () => slideDataSingle.length === 2015 - 1900 + 1 ? 0 : 1)
         .attr("class", d => significantEvents[d.year] ? 'dot detailed' : 'dot')
         .attr("cx", d => xScale(d.year))
         .attr("cy", d => yScale(d.mortality))
@@ -178,54 +180,145 @@ function drawDynamicElems(slideDataSingle) {
         })
         .on('mouseout', () => {
             tooltip.style("opacity", 0)
-            .style("display", "none");
+                .style("display", "none");
         });
+
+    if (slideDataSingle.length === 2015 - 1900 + 1) {
+        const slices = [1900, 1929, 1958, 1987];
+        let xRectScale = d3.scaleBand()
+            .domain(slices)
+            .range([0, graphWidth])
+        g.selectAll("rect")
+            .data(slices)
+            .enter()
+            .append("rect")
+            .style('opacity', 0)
+            .attr("x", d => xRectScale(d))
+            .attr("y", yScale(maxMortality))
+            .attr("width", graphWidth / 4)
+            .attr("height", yScale(minMortality))
+            .on('click', (d, i) => goTo(i+1));
+
+        for (let i=0; i<4; i++) {
+            g.append("text")
+            .attr("class", "subtitle")
+            .attr("text-anchor", "middle")
+            .attr("x", graphWidth / 2)
+            .attr("y", -marginX / 6)
+            .attr("dy", "+.75em")
+            .style("opacity", 0);
+        }
+
+        setTimeout(() => {
+            g.selectAll("rect")
+                .attr('class', 'rect')
+                .transition()
+                .delay((d, i) => 700 * i)
+                .duration(600)
+                .style('opacity', 0.2)
+                .transition()
+                .style('opacity', 0);
+            
+            g.selectAll(".subtitle")
+                .text((d, i) => `${1900 + i * 29} - ${1900 + (i + 1) * 29 - 1}`)
+                .transition()
+                .delay((d, i) => 700 * i)
+                .duration(600)
+                .style('opacity', 1)
+                .transition()
+                .style('opacity', 0);
+        }, 4500);
+
+        setTimeout(() => {
+            g.selectAll("rect")
+                .on('mouseover', (d, i) => {
+                    g.selectAll(".subtitle")
+                        .transition()
+                        .style('opacity', (d2, i2) => i2 === i? 1 : 0);
+                })
+                .on('mouseout', () => {
+                    g.selectAll(".subtitle")
+                        .transition()
+                        .style('opacity', 0);
+                });
+        }, 4500);
+
+        setTimeout(() => {
+            g.selectAll("rect")
+            .attr('class','rect done');
+        }, 7000);
+    } else {
+        g.append("text")
+        .attr("class", "subtitle")
+        .attr("text-anchor", "middle")
+        .attr("x", graphWidth / 2)
+        .attr("y", -marginX / 6)
+        .attr("dy", "+.75em")
+        .text(`${1900 + (currentSlide-1) * 29} - ${1900 + currentSlide * 29 - 1}`)
+    }
 }
 
-function mapMortalityData(data) {
+function getSlideData(fullData) {
     const slideData = [[]];
     let slideNum = 0;
-    data
+    fullData.forEach(d => {
+        if (Math.floor((d.year - 1900) / interval) > slideNum) {
+            ++slideNum;
+            slideData.push([]);
+        }
+        slideData[slideNum].push(d);
+    });
+    return slideData;
+};
+
+function getMortalityData(data) {
+    return data
         .filter(d => d.Cause === 'Influenza and Pneumonia')
         .map(d => ({
             year: Number(d.Year),
             mortality: Number(d['Age Adjusted Death Rate'])
-        }))
-        .forEach(d => {
-            if (Math.floor((d.year - 1900) / interval) > slideNum) {
-                ++slideNum;
-                slideData.push([]);
-            }
-            slideData[slideNum].push(d);
-        });
-    return slideData;
-};
+        }));
+}
 
 function goTo(slideNum) {
-    currentSlide = slideNum;
-    highlightSlide();
-    const slideDataSingle = slideData[slideNum];
-    startYear = slideDataSingle[0].year;
-    endYear = slideDataSingle[slideDataSingle.length - 1].year;
 
-    drawDynamicElems(slideDataSingle);
-    drawStaticElems();
+    currentSlide = slideNum;
+    let graphData;
     const prev = document.getElementsByClassName('prev')[0];
     const next = document.getElementsByClassName('next')[0];
-    if (startYear === 1900) {
-        prev.classList.add('hidden');
-        next.classList.remove('hidden');
-    } else if (endYear === 2015) {
-        prev.classList.remove('hidden');
-        next.classList.add('hidden');
+
+    if (slideNum !== 0) {
+        document.getElementsByClassName('slide-nav')[0].classList.remove('hidden');
+        document.getElementsByClassName('slide-0')[0].classList.remove('hidden');
+        graphData = slideData[slideNum-1];
+        startYear = graphData[0].year;
+        endYear = graphData[graphData.length - 1].year;
+
+        if (startYear === 1900) {
+            prev.classList.add('hidden');
+            next.classList.remove('hidden');
+        } else if (endYear === 2015) {
+            prev.classList.remove('hidden');
+            next.classList.add('hidden');
+        } else {
+            prev.classList.remove('hidden');
+            next.classList.remove('hidden');
+        }
     } else {
-        prev.classList.remove('hidden');
-        next.classList.remove('hidden');
+        graphData = mortalityData;
+        startYear = 1900;
+        endYear = 2015;
+        prev.classList.add('hidden');
     }
+
+    highlightSlide();
+    drawDynamicElems(graphData);
+    drawStaticElems();
+
 }
 
 function goNext() {
-    if (endYear !== 2015) {
+    if (startYear !== 1987) {
         currentSlide++;
         goTo(currentSlide);
     }

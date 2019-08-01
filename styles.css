@@ -8,6 +8,10 @@ body {
     font-size: 14px;
     fill: #2c4d91;
 }
+.subtitle {
+    font-size: 18px;
+    fill: #ccc;
+}
 
 .axis-label {
     font-size: 12px;
@@ -105,9 +109,10 @@ ul {
     list-style: none;
     top: 20px;
     left: 50%;
+    text-align: center;
     position: absolute;
     transform: translateX(-50%);
-    display: inline-block;
+    display: flex;
 }
 li {
     border-style: solid;
@@ -121,12 +126,30 @@ li:hover, li.current {
     color: #fff;
     cursor: pointer;
 }
-li:first-child {
-    border-width: 1px 0px 1px 1px;
+li.slide-0 {
+    border-width: 1px;
+    margin-right: 10px;
 }
-li:nth-child(2) {
+.slide-nav.hidden {
+    display: none;
+}
+.slide-nav li:first-child {
+    border-width: 1px 0px 1px 1px;
+    margin-right: 0;
+}
+.slide-nav li:nth-child(2) {
     border-left-width: 1px;
 }
 li.hidden {
     opacity: 0;
+}
+
+.rect {
+    fill: #23bec9;
+    transition: ease-in-out; /*0.3s;*/
+}
+.rect.done:hover {
+    fill: #23bec9;
+    opacity: 0.3 !important;
+    transition: ease-in-out 0.5s;
 }
