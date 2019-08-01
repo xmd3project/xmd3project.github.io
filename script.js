@@ -4,6 +4,7 @@ let startYear, endYear;
 let svg, g;
 let graphWidth, graphHeight, canvasWidth, canvasHeight, margin;
 const interval = (2015 - 1900 + 1) / 4;
+let initialLoad = true;
 const significantEvents = {
     "1918": {
         "title": "Spanish Flu (H1N1)",
@@ -136,13 +137,16 @@ function drawDynamicElems(slideDataSingle) {
         .attr("class", "line hidden")
         .attr("d", line);
     const length = path.node().getTotalLength();
-    path.attr("stroke-dasharray", `${length} ${length}`)
-        .attr("stroke-dashoffset", length)
-        .transition()
-        .duration(5000)
-        .attr("class", "line")
-        .attr("stroke-dashoffset", 0);
-
+    if (initialLoad || currentSlide !== 0) {
+        path.attr("stroke-dasharray", `${length} ${length}`)
+            .attr("stroke-dashoffset", length)
+            .transition()
+            .duration(5000)
+            .attr("class", "line")
+            .attr("stroke-dashoffset", 0);
+    } else {
+        path.attr("class", "line");
+    }
     g.selectAll(".dot")
         .data(slideDataSingle)
         .enter().append("circle")
@@ -197,62 +201,75 @@ function drawDynamicElems(slideDataSingle) {
             .attr("y", yScale(maxMortality))
             .attr("width", graphWidth / 4)
             .attr("height", yScale(minMortality))
-            .on('click', (d, i) => goTo(i+1));
-
-        for (let i=0; i<4; i++) {
+            .on('click', (d, i) => goTo(i + 1));
+        for (let i = 0; i < 4; i++) {
             g.append("text")
+                .attr("class", "subtitle")
+                .attr("text-anchor", "middle")
+                .attr("x", graphWidth / 2)
+                .attr("y", -marginX / 6)
+                .attr("dy", "+.75em")
+                .style("opacity", 0);
+        }
+        if (initialLoad) {
+            animateSlidePreview(g);
+            animateYearRangeSubtitle(g);
+        } else if (currentSlide === 0) {
+            g.selectAll(".subtitle")
+                .text((d, i) => `${1900 + i * 29} - ${1900 + (i + 1) * 29 - 1}`)
+            addYearRangeSubtitleHover(g);
+        }
+
+    } else {
+        g.append("text")
             .attr("class", "subtitle")
             .attr("text-anchor", "middle")
             .attr("x", graphWidth / 2)
             .attr("y", -marginX / 6)
             .attr("dy", "+.75em")
-            .style("opacity", 0);
-        }
-
-        setTimeout(() => {
-            g.selectAll("rect")
-                .attr('class', 'rect')
-                .transition()
-                .delay((d, i) => 700 * i)
-                .duration(600)
-                .style('opacity', 0.2)
-                .transition()
-                .style('opacity', 0);
-            
-            g.selectAll(".subtitle")
-                .text((d, i) => `${1900 + i * 29} - ${1900 + (i + 1) * 29 - 1}`)
-                .transition()
-                .delay((d, i) => 700 * i)
-                .duration(600)
-                .style('opacity', 1)
-                .transition()
-                .style('opacity', 0);
-        }, 4500);
-
-        setTimeout(() => {
-            g.selectAll("rect")
-            .attr('class','rect done')
-                .on('mouseover', (d, i) => {
-                    g.selectAll(".subtitle")
-                        .transition()
-                        .style('opacity', (d2, i2) => i2 === i? 1 : 0);
-                })
-                .on('mouseout', () => {
-                    g.selectAll(".subtitle")
-                        .transition()
-                        .style('opacity', 0);
-                });
-        }, 7000);
-
-    } else {
-        g.append("text")
-        .attr("class", "subtitle")
-        .attr("text-anchor", "middle")
-        .attr("x", graphWidth / 2)
-        .attr("y", -marginX / 6)
-        .attr("dy", "+.75em")
-        .text(`${1900 + (currentSlide-1) * 29} - ${1900 + currentSlide * 29 - 1}`)
+            .text(`${1900 + (currentSlide - 1) * 29} - ${1900 + currentSlide * 29 - 1}`)
     }
+}
+
+function animateSlidePreview(g) {
+    setTimeout(() => {
+        g.selectAll("rect")
+            .attr('class', 'rect')
+            .transition()
+            .delay((d, i) => 700 * i)
+            .duration(600)
+            .style('opacity', 0.2)
+            .transition()
+            .style('opacity', 0);
+
+        g.selectAll(".subtitle")
+            .text((d, i) => `${1900 + i * 29} - ${1900 + (i + 1) * 29 - 1}`)
+            .transition()
+            .delay((d, i) => 700 * i)
+            .duration(600)
+            .style('opacity', 1)
+            .transition()
+            .style('opacity', 0);
+    }, 4500);
+}
+function animateYearRangeSubtitle(g) {
+    setTimeout(() => {
+        addYearRangeSubtitleHover(g);
+    }, 7000);
+}
+function addYearRangeSubtitleHover(g) {
+    g.selectAll("rect")
+        .attr('class', 'rect done')
+        .on('mouseover', (d, i) => {
+            g.selectAll(".subtitle")
+                .transition()
+                .style('opacity', (d2, i2) => i2 === i ? 1 : 0);
+        })
+        .on('mouseout', () => {
+            g.selectAll(".subtitle")
+                .transition()
+                .style('opacity', 0);
+        });
 }
 
 function getSlideData(fullData) {
@@ -285,9 +302,10 @@ function goTo(slideNum) {
     const next = document.getElementsByClassName('next')[0];
 
     if (slideNum !== 0) {
+        initialLoad = false;
         document.getElementsByClassName('slide-nav')[0].classList.remove('hidden');
         document.getElementsByClassName('slide-0')[0].classList.remove('hidden');
-        graphData = slideData[slideNum-1];
+        graphData = slideData[slideNum - 1];
         startYear = graphData[0].year;
         endYear = graphData[graphData.length - 1].year;
 
