@@ -152,4 +152,5 @@ li.hidden {
     fill: #23bec9;
     opacity: 0.3 !important;
     transition: ease-in-out 0.5s;
+    cursor: pointer;
 }

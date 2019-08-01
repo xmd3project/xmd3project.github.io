@@ -231,6 +231,7 @@ function drawDynamicElems(slideDataSingle) {
 
         setTimeout(() => {
             g.selectAll("rect")
+            .attr('class','rect done')
                 .on('mouseover', (d, i) => {
                     g.selectAll(".subtitle")
                         .transition()
@@ -241,12 +242,8 @@ function drawDynamicElems(slideDataSingle) {
                         .transition()
                         .style('opacity', 0);
                 });
-        }, 4500);
-
-        setTimeout(() => {
-            g.selectAll("rect")
-            .attr('class','rect done');
         }, 7000);
+
     } else {
         g.append("text")
         .attr("class", "subtitle")
