@@ -150,7 +150,7 @@ function drawDynamicElems(slideDataSingle) {
     g.selectAll(".dot")
         .data(slideDataSingle)
         .enter().append("circle")
-        .style('opacity', () => slideDataSingle.length === 2015 - 1900 + 1 ? 0 : 1)
+        .style('display', () => slideDataSingle.length === 2015 - 1900 + 1 ? 'none' : 'normal')
         .attr("class", d => significantEvents[d.year] ? 'dot detailed' : 'dot')
         .attr("cx", d => xScale(d.year))
         .attr("cy", d => yScale(d.mortality))
