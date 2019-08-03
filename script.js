@@ -11,10 +11,27 @@ const significantEvents = {
         "description": "Most severe pandemic in recent history, caused by a virus of avian origin. 500 million people or one-third of the world’s population became infected with this virus. High mortality in healthy people was a unique feature of this pandemic.",
         "link": "https://www.cdc.gov/flu/pandemic-resources/1918-pandemic-h1n1.html"
     },
+    "1930": {
+        "title": "Virus grown in cell culture",
+        "description": "Cell culture was developed, allowing proof that the flu is caused by a virus and isolation of that virus. This paved the way for the production of viral vaccines.",
+        "link": "https://www.historyofvaccines.org/content/articles/early-tissue-and-cell-culture-vaccine-development"
+    },
     "1940": {
         "title": "Medical developments in 1940s",
         "description": "First inactivated flu vaccine was developed and licensed for use in civilians. Mechanical ventilators were developed to support breathing in patients suffering from respiratory complications.",
         "link": "https://www.cdc.gov/flu/pandemic-resources/pandemic-timeline-1930-and-beyond.htm"
+    },
+    "1942": {
+        "title": "Introduction of influenza A/B vaccine",
+        "description": "The vaccine was introduced to the Armed Forces Epidemiological Board." 
+    },
+    "1945": {
+        "title": "Influenza vaccine available to civilians",
+        "description": "The influenza vaccine was licensed, and began to be used for civilians after WWII."
+    },
+    "1948": {
+        "title": "WHO Influenza Centre is formed",
+        "description": "The World Health Organization (WHO) Influenza Centre is established to collect and characterize influenza viruses, develop methods for lab diagnosis of infections, establish a lab network, and widely communicate the data accumulated from their investigations."
     },
     "1957": {
         "title": "Asian Flu (H2N2)",
@@ -26,6 +43,15 @@ const significantEvents = {
         "description": "A virus that combined parts of an avian influenza A virus and the 1957 H2N2 virus. Estimated number of deaths was 1 million worldwide, mostly affecting people 65 years and older. Continues to circulate worldwide as a seasonal influenza A virus.",
         "link": "https://www.cdc.gov/flu/pandemic-resources/1968-pandemic.html"
     },
+    "1980": {
+        "title": "Response to outbreaks",
+        "description": "CDC begins collecting reports of influenza outbreaks from state and territorial epidemiologists."
+    },
+    "1997": {
+        "title": "Tracking movement of flu viruses globally",
+        "description": "FluNet, a web-based flu surveillance tool, is launched by WHO. It is a critical tool for tracking the movement of flu viruses globally. Country data is updated weekly and is publically available.",
+        "link": "https://www.who.int/influenza/gisrs_laboratory/flunet/en/"
+    },
     "1999": {
         "title": "Pandemic planning and drug development",
         "description": "WHO published a framework to enhance influenza surveillance, vaccine production and distribution, antiviral drugs, influenza research and emergency preparedness. The neuraminidase inhibitors oseltamivir (Tamiflu) and zanamivir (Relenza) were licensed to treat influenza infection.",
@@ -36,37 +62,42 @@ const significantEvents = {
         "description": "Severe acute respiratory syndrome (SARS) outbreak in southern China caused an eventual 8,098 cases, resulting in 774 deaths reported in 37 countries. Most SARS patients develop pneumonia.",
         "link": "https://www.cdc.gov/sars/about/fs-sars.html#outbreak"
     },
+    "2007": {
+        "title": "Novel virus list",
+        "description": "Human infection with a novel influenza virus is added to the nationally notifiable disease list."
+    },
     "2009": {
         "title": "Swine Flu (H1N1)",
         "description": "A novel virus with an unidentified combination of genes from bird, swine and human flu viruses. Hence, seasonal flu vaccines offered little cross-protection against this virus. First found in the United States, it spread quickly across the world. Mainly affected children, and young and middle-aged adults.",
         "link": "https://www.cdc.gov/flu/pandemic-resources/1957-1958-pandemic.html"
+    },
+    "2012": {
+        "title": "More advanced vaccine for greater coverage",
+        "description": "WHO makes first vaccine composition recommendation for a quadrivalent vaccine.",
+        "link": "https://www.cdc.gov/flu/prevent/quadrivalent.htm?CDC_AA_refVal=https%3A%2F%2Fwww.cdc.gov%2Fflu%2Fprotect%2Fvaccine%2Fquadrivalent.htm"
     }
 };
+
+const chartDescription = [
+    'In the 19th century, much efforts were spent on controlling bacterial infections. Vaccines were developed for rabies, cholera, typhoid, among others. However, a vaccine for influenza did not yet exist. Annual death-rate from influenza and pneumonia was more than 10x higher than it is today.',
+    'In the 1940s, significant developments were made in vaccines and treatments for complications for people infected with the flu virus, greatly reducing the death rate.',
+    'Governments and organizations around the world, including the U.S. Public Health Service began to recommend annual flu vaccination for people at high risk of serious flu complications. The 1970s was a tumultuous period as cases of Guillain-Barre syndrome, a neurologic condition that in rare instances has been associated with vaccination, appeared to be higher than expected among vaccine recipients, causing some officials to determine the vaccination program should be halted. However, greater importance began to be placed on collecting reports of influenza outbreaks from epidemiologists to prevent and better respond to potential pandemics.',
+    'With greater understanding of the importance of vaccine as a preventative measure, vaccines became a covered medical benefit and vaccination programs were established to get children vaccinated on schedule. In present day, mortality from the flu has become a rather rare occurence, and death rates significantly lower compared to a century ago.'
+]
 
 async function init() {
     const data = await d3.csv("https://xmd3project.github.io/NCHS_Age-adjusted_Death_Rates_for_Selected_Major_Causes_of_Death.csv");
     mortalityData = getMortalityData(data);
     slideData = getSlideData(mortalityData);
 
-    marginX = 280;
-    marginY = 150;
-    graphWidth = window.innerWidth - 2 * marginX;
-    graphHeight = window.innerHeight - 2 * marginY;
-    canvasWidth = window.innerWidth - marginX;
-    canvasHeight = window.innerHeight - marginY;
+    marginX = 100;
+    marginY = 100;
+    graphHeight = 400;
 
     goTo(0);
 };
 
 function drawStaticElems() {
-    // Plot labels
-    g.append("text")
-        .attr("class", "title")
-        .attr("text-anchor", "middle")
-        .attr("x", graphWidth / 2)
-        .attr("y", -marginX / 4)
-        .attr("dy", "+.75em")
-        .text('Age-adjusted Death Rates for Influenza and Pneumonia');
     g.append("text")
         .attr("class", "axis-label")
         .attr("text-anchor", "end")
@@ -114,13 +145,12 @@ function drawDynamicElems(slideDataSingle) {
     var yAxis = d3.axisLeft(yScale)
         .ticks(4);
 
-    svg = d3.select("body").append("svg")
-        .attr("width", canvasWidth)
-        .attr("height", canvasHeight)
-        .attr("transform", `translate(${marginX / 2}, ${marginY / 2})`);
+    svg = d3.select(".content").insert("svg", ":first-child")
+        .attr("width", graphWidth + marginX)
+        .attr("height", graphHeight + marginY);
 
     g = svg.append("g")
-        .attr("transform", `translate(${marginX / 2}, ${marginY / 2})`);
+        .attr("transform", `translate(70, 50)`);
 
     // draw axes
     g.append("g")
@@ -151,7 +181,7 @@ function drawDynamicElems(slideDataSingle) {
         .data(slideDataSingle)
         .enter().append("circle")
         .style('display', () => slideDataSingle.length === 2015 - 1900 + 1 ? 'none' : 'normal')
-        .attr("class", d => significantEvents[d.year] ? 'dot detailed' : 'dot')
+        .attr("class", d => significantEvents[d.year] ? `dot detailed ${significantEvents[d.year].link ? 'linked' : ''}` : 'dot')
         .attr("cx", d => xScale(d.year))
         .attr("cy", d => yScale(d.mortality))
         .attr("r", 5)
@@ -171,9 +201,11 @@ function drawDynamicElems(slideDataSingle) {
                     .html(`
                     <b>${detail.title}</b>: ${detail.description}
                 `);
-                tooltip.append('img')
-                    .attr('src', "./external-link.png")
-                    .attr('class', 'link-out');
+                if(significantEvents[d.year].link) {
+                    tooltip.append('img')
+                        .attr('src', "./external-link.png")
+                        .attr('class', 'link-out');
+                }
             }
         })
         .on('click', d => {
@@ -206,8 +238,8 @@ function drawDynamicElems(slideDataSingle) {
             g.append("text")
                 .attr("class", "subtitle")
                 .attr("text-anchor", "middle")
-                .attr("x", graphWidth / 2)
-                .attr("y", -marginX / 6)
+                .attr("x", graphWidth / 2 - marginX/4)
+                .attr("y", -30)
                 .attr("dy", "+.75em")
                 .style("opacity", 0);
         }
@@ -219,15 +251,12 @@ function drawDynamicElems(slideDataSingle) {
                 .text((d, i) => `${1900 + i * 29} - ${1900 + (i + 1) * 29 - 1}`)
             addYearRangeSubtitleHover(g);
         }
+        document.getElementsByClassName('chart-summary')[0].classList.add('hidden');
 
     } else {
-        g.append("text")
-            .attr("class", "subtitle")
-            .attr("text-anchor", "middle")
-            .attr("x", graphWidth / 2)
-            .attr("y", -marginX / 6)
-            .attr("dy", "+.75em")
-            .text(`${1900 + (currentSlide - 1) * 29} - ${1900 + currentSlide * 29 - 1}`)
+        document.getElementsByClassName('chart-summary')[0].classList.remove('hidden');
+        document.getElementsByClassName('subtitle')[0].innerHTML = `${1900 + (currentSlide - 1) * 29} - ${1900 + currentSlide * 29 - 1}`;
+        document.getElementsByClassName('summary-text')[0].innerHTML = chartDescription[currentSlide-1];
     }
 }
 
@@ -308,6 +337,7 @@ function goTo(slideNum) {
         graphData = slideData[slideNum - 1];
         startYear = graphData[0].year;
         endYear = graphData[graphData.length - 1].year;
+        graphWidth = 400;
 
         if (startYear === 1900) {
             prev.classList.add('hidden');
@@ -323,6 +353,7 @@ function goTo(slideNum) {
         graphData = mortalityData;
         startYear = 1900;
         endYear = 2015;
+        graphWidth = window.innerWidth * 0.8 - marginX;
         prev.classList.add('hidden');
     }
 

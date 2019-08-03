@@ -5,12 +5,42 @@ body {
 }
 
 .title {
-    font-size: 14px;
-    fill: #2c4d91;
+    font-size: 16px;
+    color: #2c4d91;
+    position: absolute;
+    left: 50%;
+    top: 80px;
+    transform: translateX(-50%);
+    white-space: nowrap;
+}
+.content {
+    margin: 0 auto;
+    display: flex;
+    flex-direction: row;
+    margin-top: 100px;
+    width: 80%;
+    min-width: min-content;
+    margin-bottom: 100px;
 }
 .subtitle {
     font-size: 18px;
     fill: #ccc;
+    text-align: center;
+}
+.chart-summary {
+    min-width: 300px;
+    width: 300px;
+    font-size: 14px;
+    line-height: 1.5;
+    margin-top: 50px;
+    margin-left: 50px;
+}
+.chart-summary.hidden {
+    display: none;
+}
+.chart-summary .subtitle {
+    margin-bottom: 10px;
+    color: #7382a1;
 }
 
 .axis-label {
@@ -55,7 +85,7 @@ body {
     stroke-width: 2;
 }
 
-.dot.detailed:hover {
+.dot.detailed.linked:hover {
     stroke: #324468;
     cursor: pointer;
     animation-name: flash;
@@ -81,7 +111,7 @@ body {
     color: #324468;
     line-height: 1.5;
     z-index: 1;
-    max-width: 280px;
+    max-width: 300px;
     margin: 20px;
 }
 .tooltip b {
@@ -106,7 +136,7 @@ body {
 
 ul {
     margin: auto 0;
-    list-style: none;
+    list-style-type: none;
     top: 20px;
     left: 50%;
     text-align: center;

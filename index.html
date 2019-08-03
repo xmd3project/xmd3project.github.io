@@ -1,21 +1,29 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
+
 <head></head>
 <link rel="stylesheet" href="styles.css">
 </head>
 
 <body onload="init()">
-<ul>
-<li class="slide-0 hidden" onclick="goTo(0)">TOP</li>
-<div class="slide-nav hidden">
-<li class="prev" onclick="goPrev()"><</li>
-<li class="slide-1" onclick="goTo(1)">1</li>
-<li class="slide-2" onclick="goTo(2)">2</li>
-<li class="slide-3" onclick="goTo(3)">3</li>
-<li class="slide-4" onclick="goTo(4)">4</li>
-<li class="next" onclick="goNext()">></li>
-</div>
-</ul>
+    <ul>
+        <li class="slide-0 hidden" onclick="goTo(0)">TOP</li>
+        <div class="slide-nav hidden">
+            <li class="prev" onclick="goPrev()"><</li>
+            <li class="slide-1" onclick="goTo(1)">1</li>
+            <li class="slide-2" onclick="goTo(2)">2</li>
+            <li class="slide-3" onclick="goTo(3)">3</li>
+            <li class="slide-4" onclick="goTo(4)">4</li>
+            <li class="next" onclick="goNext()">></li>
+        </div>
+    </ul>
+    <div class="title">Age-adjusted Death Rates for Influenza and Pneumonia</div>
+    <div class="content">
+        <div class="chart-summary">
+            <div class="subtitle"></div>
+            <div class="summary-text"></div>
+        </div>
+    </div>
 </body>
 
 <script src="https://d3js.org/d3.v5.min.js"></script>
